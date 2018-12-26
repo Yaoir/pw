@@ -36,12 +36,8 @@ const MAXLEN = 256
  *
  */
 
-// Default password length
-
-const DEFLEN = 15
-
-var length int = DEFLEN	// length of password
-var password []rune	// password string
+const DEFLEN = 15	// Default password length
+var length int = DEFLEN	// Actual password length
 
 func usage(cmdname string) {
 	fmt.Fprintf(os.Stderr,"usage: %s [length]\n",cmdname);
@@ -50,22 +46,26 @@ func usage(cmdname string) {
 
 var randomgen *rand.Rand
 
-// init random number generator
+// Initialize random number generator
 
 func init_random() {
 //
-        randomgen = rand.New(rand.NewSource(time.Now().UnixNano()))
-// TODO: check for errors in above (?)
+	t := time.Now()
+	if t.IsZero() {
+		fmt.Fprintf(os.Stderr,"%s: Cannot initialize random number generator\n",os.Args[0])
+		os.Exit(2)
+	}
+	randomgen = rand.New(rand.NewSource(t.UnixNano()))
 }
 
-// return a random integer
+// Return a random integer
 
 func random() int {
 //
         return randomgen.Int()
 }
 
-// returns true if the rune is an ASCII digit
+// Returns true if the rune is an ASCII digit
 
 func isdigit(c rune) bool {
 //
@@ -73,22 +73,32 @@ func isdigit(c rune) bool {
 	return false
 }
 
-// TODO:
-// func isupper(c rune) bool {
-// func islower(c rune) bool {
-// ( and use those in isalnum() )
-// Switch to byte, rather than rune
+// Returns true if the rune is an uppercase letter
 
-// returns true if the rune is an ASCII alphanumeric
-
-func isalnum(c rune) bool {
-	if isdigit(c) { return true }
-	if c >= 'a' && c <= 'z' { return true }
+func isupper(c rune) bool {
+//
 	if c >= 'A' && c <= 'Z' { return true }
 	return false
 }
 
-// returns true if there is a digit in the string
+// Returns true if the rune is an lowercase letter
+
+func islower(c rune) bool {
+//
+	if c >= 'a' && c <= 'z' { return true }
+	return false
+}
+
+// Returns true if the rune is an ASCII alphanumeric
+
+func isalphanumeric(c rune) bool {
+	if isdigit(c) { return true }
+	if isupper(c) { return true }
+	if islower(c) { return true }
+	return false
+}
+
+// Returns true if there is a digit in the string
 
 func digitcheck(s []rune) bool {
 //
@@ -96,55 +106,75 @@ func digitcheck(s []rune) bool {
 	return false
 }
 
-// TODO:
-// uppercheck()
-// lowercheck()
+// Returns true if there is an uppercase letter in the string
+
+func uppercheck(s []rune) bool {
+//
+	for i := 0; i < len(s); i++ { if isupper(s[i]) { return true } }
+	return false
+}
+
+// Returns true if there is an lowercase letter in the string
+
+func lowercheck(s []rune) bool {
+//
+	for i := 0; i < len(s); i++ { if islower(s[i]) { return true } }
+	return false
+}
 
 // Highest value of rune that is within range of ASCII characters
 
 const max_ascii = 128
 
-func generate() {
+// Create a random string and return it
+
+func generate() []rune {
 //
-	for len(password) < length {
+	randstr := []rune{}
+
+	for len(randstr) < length {
 	//
 		for {
 		//
 			n := rune(random()%max_ascii)
-			if isalnum(n) {
+			if isalphanumeric(n) {
 			//
-				password = append(password,n)
+				randstr = append(randstr,n)
 				break
 			}
 		}
 	}
+
+	return randstr
 }
 
 func main() {
+	var s string
+	var err error
+	var pw []rune
 
 	if len(os.Args) > 2 { usage(os.Args[0]) }
 
 	if len(os.Args) == 2 {
-		length, _ = strconv.Atoi(os.Args[1])
-// TODO: usage() if error!
-		if length == 0 { usage(os.Args[0]) }
-		// quietly enforce minimum/maximum length
-// TODO: exit if length too small or too large
-		if length < MINLEN { length = MINLEN }
-		if length > MAXLEN { length = MAXLEN }
+		length, err = strconv.Atoi(os.Args[1])
+		if err != nil { usage(os.Args[0]) }
+
+		if length < MINLEN || length > MAXLEN {
+			if length < MINLEN { s = "small" } else { s = "large" }
+			fmt.Fprintf(os.Stderr,"%s: length is too %s\n",os.Args[0],s)
+			os.Exit(1)
+		}
 	}
 
 	init_random()
 
-	// generate passwords until one passes test
+	// generate passwords until one passes tests
 
 	for {
-		password = []rune{}
-		generate()
-		// make sure the password has at least one digit
-		if digitcheck(password) { break }
+		pw = generate()
+		// make sure the password has at least one digit, one uppercase letter, and one lowercase letter
+		if digitcheck(pw) && uppercheck(pw) && lowercheck(pw) { break }
 	}
 
-// TODO: check length
-	fmt.Printf("%s\n",string(password))
+	fmt.Printf("%s\n",string(pw))
 }
