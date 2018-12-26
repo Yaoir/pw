@@ -1,0 +1,24 @@
+pw(1) -- password generator
+===========================
+
+## SYNOPSIS
+
+`pw` [`length`]
+
+## DESCRIPTION
+
+## BUGS
+
+pw(1) does not include punctuation characters in passwords.
+
+## AUTHOR
+
+Jay Ts
+(http://jayts.com)
+
+## COPYRIGHT
+
+Copyright 2018 Jay Ts
+
+Released under the GNU Public License, version 3.0 (GPLv3)
+(http://www.gnu.org/licenses/gpl.html)

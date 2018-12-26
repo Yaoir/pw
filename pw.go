@@ -1,6 +1,6 @@
 package main
 
-/* Print a random password, using letters (upper- and lowercase) and digits. */
+// Print a random password, using ASCII letters and digits.
 
 import (
 	"fmt"
@@ -10,32 +10,38 @@ import (
 	"time"
 	)
 
-/* Minimum and Maximum Length Allowed */
+// Minimum and Maximum Length Allowed
+// The minimum is two because a digit is required in the password.
+// If the minimum were set to 1, then the result would always be simply a single digit.
 
 const MINLEN = 2
 const MAXLEN = 256
 
-/* Default Length (if no argment provided) */
+/* Default Password Length */
 
 /* This is based on:
+ *
  * First,
- * current CPU speed per computer: about 10 billion per sec = 1e10
- * number of seconds in year: 32e6 -> 1e7
- * years in age of universe (appx) 1e9
- * all of those multiplied together: T = 1e26 clock cycles
+ * Current CPU speed per computer: about 10 billion clock cycles per sec = 1e10
+ * Number of seconds in year: 32e6 (round up to 1e7)
+ * Age of universe in years: 1e10 (rounded down a bit)
+ * All of those multiplied together: T = 1e27 clock cycles
+ *
  * Second,
  * a-e: 26 letters, A-E: 26 letters, 0-9: 10 digits
  * so we are working in base (26+26+10) = base 62
- * To create a password long enough we're sure it won't be broken,
- * except by chance,
- * length = log(base 26) 1e26 = 15 digits. 
+ *
+ * To create a password long enough we're sure it won't
+ * be broken (except by extremely wild chance, of course):
+ *
+ * length = log(base 62) 1e27 = 15 digits. 
+ *
  */
 
 const DEFLEN = 15
 
-/* password string */
-
-var password [MAXLEN+1]rune
+var length int = DEFLEN	// length of password
+var password []rune	// password string
 
 func usage(cmdname string) {
 	fmt.Printf("usage: %s [length]\n",cmdname);
@@ -44,21 +50,29 @@ func usage(cmdname string) {
 
 var randomgen *rand.Rand
 
-/* init random number generator */
+// init random number generator
 
-func srandom() {
+func init_random() {
 //
         randomgen = rand.New(rand.NewSource(time.Now().UnixNano()))
 }
 
-/* replacement for C library random() function */
+// return a random integer
 
 func random() int {
 //
         return randomgen.Int()
 }
 
-var length int = DEFLEN
+// returns true if the rune is an ASCII digit
+
+func isdigit(c rune) bool {
+//
+	if c >= '0' && c <= '9' { return true }
+	return false
+}
+
+// returns true if the rune is an ASCII alphanumeric
 
 func isalnum(c rune) bool {
 	if isdigit(c) { return true }
@@ -66,6 +80,16 @@ func isalnum(c rune) bool {
 	if c >= 'A' && c <= 'Z' { return true }
 	return false
 }
+
+// returns true if there is a digit in the string
+
+func digitcheck(s []rune) bool {
+//
+	for i := 0; i < len(s); i++ { if isdigit(s[i]) { return true } }
+	return false
+}
+
+// Highest value of rune that is within range of ASCII characters
 
 const max_ascii = 128
 
@@ -78,26 +102,12 @@ func generate() {
 			n := rune(random()%max_ascii)
 			if isalnum(n) {
 			//
-				password[i] = n
+				password = append(password,n)
 				i++
 				break
 			}
 		}
 	}
-	password[length] = '\000'
-}
-
-func isdigit(c rune) bool {
-	if c >= '0' && c <= '9' { return true }
-	return false
-}
-
-/* returns true if there is a digit in the string */
-
-func digitcheck(s []rune) bool {
-
-	for i := 0; s[i] != '\000'; i++ { if isdigit(s[i]) { return true } }
-	return false
 }
 
 func main() {
@@ -107,19 +117,21 @@ func main() {
 	if len(os.Args) == 2 {
 		length, _ = strconv.Atoi(os.Args[1])
 		if length == 0 { usage(os.Args[0]) }
-		/* quietly enforce minimum/maximum length */
+		// quietly enforce minimum/maximum length
 		if length < MINLEN { length = MINLEN }
 		if length > MAXLEN { length = MAXLEN }
 	}
 
-	srandom()
+	init_random()
 
-	/* generate passwords until one passes test */
+	// generate passwords until one passes test
 
 	for {
+		password = []rune{}
 		generate()
-		if digitcheck(password[:]) { break }
+		// make sure the password has at least one digit
+		if digitcheck(password) { break }
 	}
 
-	fmt.Printf("%s\n",string(password[:length]))
+	fmt.Printf("%s\n",string(password))
 }
