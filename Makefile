@@ -11,7 +11,7 @@
 # Modify these two settings to fit your needs:
 
 # 1. Where to install the pw program:
-BINDIR=/home/jay/.bin
+BINDIR=/home/jay/.bin/elf
 # Or perhaps one of:
 #BINDIR=/usr/local/bin
 #BINDIR=/usr/bin
@@ -46,9 +46,10 @@ showman:
 # Install the pw program and its manual page
 
 install:
-	@cp pw $BINDIR
-	@cp man1/pw.1 $MANDIR
+	@cp pw $(BINDIR)
 
+installman:
+	cp man1/pw.1.gz $(MANDIR)
 
 # Local backup. Create the .bak directory first,
 # and modify the file list as necessary.

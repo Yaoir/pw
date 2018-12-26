@@ -1,6 +1,8 @@
 ### Introduction
 
-pw is a secure password generator. It creates passwords that are alphanumeric strings that contain at least one digit.
+pw is a secure password generator. It creates passwords that are alphanumeric strings that contain at least one digit, one uppercase letter, and one lowercase letter.
+
+By default, the password is 15 characters long. The length can be specified by the optional argument.
 
 ### Quick Start
 
@@ -19,6 +21,13 @@ Run:
 ```
 $ pw
 YVSBve2ec7izj4y
+```
+
+Make an 8-character password:
+
+```
+$ pw 8
+k7F4c4rm
 ```
 
 ### Manual Page
@@ -41,13 +50,14 @@ DESCRIPTION
        words, Unicode UTF-8 with all code points less than 128). Specifically,
        letters A-F and a-f along with digits 0-9 are used.
 
-       The string contains at least one digit.
+       The string contains at least one digit, one uppercase letter,  and  one
+       lowercase letter.
 
 OPTIONS
-       The length of the generated password can be specified with an  optional
-       argument, which must be an integer between 2 and 256.
+       The  length of the generated password can be specified with an optional
+       argument, which must be an integer between 3 and 256.
 
-       Short  passwords  are  not secure, but are allowed so that pw(1) can be
+       Short passwords are not secure, but are allowed so that  pw(1)  can  be
        used to generate random alphanumeric strings for other purposes.
 
        By default, a length of 15 is used.
@@ -66,9 +76,7 @@ EXAMPLES
        echo ´hello, world´ >"hello-$(pw 5)"
 
 BUGS
-       Punctuation characters are not included in passwords. There is no check
-       to  make sure the password contains at least one lowercase and at least
-       one uppercase letter.
+       Punctuation characters are not included in passwords.
 
 AUTHOR
        Jay Ts (http://jayts.com)
@@ -76,7 +84,7 @@ AUTHOR
 COPYRIGHT
        Copyright 2018 Jay Ts
 
-       Released  under  the  GNU   Public   License,   version   3.0   (GPLv3)
+       Released   under   the   GNU   Public   License,  version  3.0  (GPLv3)
        (http://www.gnu.org/licenses/gpl.html)
 
 

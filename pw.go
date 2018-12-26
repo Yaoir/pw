@@ -11,10 +11,10 @@ import (
 	)
 
 // Minimum and Maximum Length Allowed
-// The minimum is two because a digit is required in the password.
-// If the minimum were set to 1, then the result would always be simply a single digit.
+// The minimum is three because a digit, an uppercase letter,
+// and a lowercase letter are all required in the password.
 
-const MINLEN = 2
+const MINLEN = 3
 const MAXLEN = 256
 
 /* The default password length is based on:
