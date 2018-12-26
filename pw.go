@@ -17,9 +17,7 @@ import (
 const MINLEN = 2
 const MAXLEN = 256
 
-/* Default Password Length */
-
-/* This is based on:
+/* The default password length is based on:
  *
  * First,
  * Current CPU speed per computer: about 10 billion clock cycles per sec = 1e10
@@ -38,13 +36,15 @@ const MAXLEN = 256
  *
  */
 
+// Default password length
+
 const DEFLEN = 15
 
 var length int = DEFLEN	// length of password
 var password []rune	// password string
 
 func usage(cmdname string) {
-	fmt.Printf("usage: %s [length]\n",cmdname);
+	fmt.Fprintf(os.Stderr,"usage: %s [length]\n",cmdname);
 	os.Exit(1);
 }
 
@@ -55,6 +55,7 @@ var randomgen *rand.Rand
 func init_random() {
 //
         randomgen = rand.New(rand.NewSource(time.Now().UnixNano()))
+// TODO: check for errors in above (?)
 }
 
 // return a random integer
@@ -71,6 +72,12 @@ func isdigit(c rune) bool {
 	if c >= '0' && c <= '9' { return true }
 	return false
 }
+
+// TODO:
+// func isupper(c rune) bool {
+// func islower(c rune) bool {
+// ( and use those in isalnum() )
+// Switch to byte, rather than rune
 
 // returns true if the rune is an ASCII alphanumeric
 
@@ -89,13 +96,17 @@ func digitcheck(s []rune) bool {
 	return false
 }
 
+// TODO:
+// uppercheck()
+// lowercheck()
+
 // Highest value of rune that is within range of ASCII characters
 
 const max_ascii = 128
 
 func generate() {
 //
-	for i := 0; i < length; {
+	for len(password) < length {
 	//
 		for {
 		//
@@ -103,7 +114,6 @@ func generate() {
 			if isalnum(n) {
 			//
 				password = append(password,n)
-				i++
 				break
 			}
 		}
@@ -116,8 +126,10 @@ func main() {
 
 	if len(os.Args) == 2 {
 		length, _ = strconv.Atoi(os.Args[1])
+// TODO: usage() if error!
 		if length == 0 { usage(os.Args[0]) }
 		// quietly enforce minimum/maximum length
+// TODO: exit if length too small or too large
 		if length < MINLEN { length = MINLEN }
 		if length > MAXLEN { length = MAXLEN }
 	}
@@ -133,5 +145,6 @@ func main() {
 		if digitcheck(password) { break }
 	}
 
+// TODO: check length
 	fmt.Printf("%s\n",string(password))
 }
