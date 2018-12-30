@@ -48,7 +48,7 @@ showman:
 install:
 	@cp pw $(BINDIR)
 
-installman:
+install-man:
 	cp man1/pw.1.gz $(MANDIR)
 
 # Local backup. Create the .bak directory first,

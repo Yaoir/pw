@@ -30,6 +30,22 @@ $ pw 8
 k7F4c4rm
 ```
 
+Install:
+
+Edit the Makefile to make sure BINDIR is set correctly for your system, then
+
+```
+$ make install
+```
+
+Install manpages:
+
+Edit the Makefile to make sure MANDIR is set correctly for your system, then
+
+```
+$ make install-man
+```
+
 ### Manual Page
 
 
